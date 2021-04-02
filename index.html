@@ -1,0 +1,25 @@
+<meta charset="UTF-8"/>
+<html>
+    <head>
+        <title>Python to URCL Compiler</title>
+    </head>
+    <body>
+        <h1>Python to URCL Compiler</h1>
+        <button onclick="lexer()">Lex code</button>
+        <button onclick="parser()">Parse code</button>
+        <button onclick="interpreter()">Compile</button>
+        <br><br>
+        <h4 style="margin-left: 50px;">Paste code here</h4>
+        <textarea id="input" style="width:500px; height:100px; margin-left: 50px;"></textarea>
+        <br><br>
+        <h4 style="margin-left: 50px;">Code lexed</h4>
+        <textarea id="lexerOutput" style="width:500px; height:150px;; margin-left: 50px;"></textarea>
+        <br><br>
+        <h4 style="margin-left: 50px;">Code parsed</h4>
+        <textarea id="parserOutput" style="width:500px; height:150px;; margin-left: 50px;"></textarea>
+        <br><br>
+        <h4 style="margin-left: 50px;">Final output here</h4>
+        <textarea id="output" style="width:500px; height:50px;; margin-left: 50px;"></textarea>
+        <script src="compiler.js"></script>
+    </body>
+</html>
