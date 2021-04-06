@@ -1,12 +1,21 @@
 
 var variables = ['abc', 'yeet'];
 
-var tt_assign = 'assign'; //imma implement these next
+var tt_for = 'for'; //imma implement these next
+var tt_while = 'while';
+
+var tt_if = 'if';
+var tt_else = 'else';
+var tt_elif = 'elseIf';
+
+var tt_assign = 'assign'; 
 var tt_equal = 'equals';
+var tt_notEqual = 'notEqual';
 var tt_greatEQ = 'greatEQ';
 var tt_lessEQ = 'lessEQ';
 var tt_less = 'less';
 var tt_great = 'greater';
+
 
 var tt_int = 'int';
 var tt_float = 'float'; //doesnt support on urcl yet
@@ -36,7 +45,6 @@ function lexer() {
             while(lines[i][j] === " " || lines[i][j] === "\t" || lines[i][j] === "\n") {
                 j++;
             }
-
             if(lines[i][j] === '+') {
                 tokens.push(tt_plus);
                 lastToken = tt_plus;
@@ -89,6 +97,69 @@ function lexer() {
                 tokens.push(tt_rparen);
                 lastToken = tt_rparen;
             }
+            // part of the new version
+            else if(lines[i][j] === '<') {
+                if(lines[i][j+1] === '=') {
+                    tokens.push(tt_lessEQ);
+                    lastToken = tt_lessEQ;
+                    j++;
+                }
+                else {
+                    tokens.push(tt_less);
+                    lastToken = tt_less;
+                }
+            }
+            else if(lines[i][j] === '>') {
+                if(lines[i][j+1] === '=') {
+                    tokens.push(tt_greatEQ);
+                    lastToken = tt_greatEQ;
+                    j++;
+                }
+                else {
+                    tokens.push(tt_great);
+                    lastToken = tt_great;
+                }
+            }
+            else if((lines[i][j] === '!') && (lines[i][j+1] === '=')) {
+                    tokens.push(tt_notEqual);
+                    lastToken = tt_notEqual;
+                    j++;
+            }
+            else if((lines[i][j] === '=') && (lines[i][j+1] === '=')) {
+                tokens.push(tt_equal);
+                lastToken = tt_equal;
+                j++;
+            }
+            else if(lines[i][j] === '=') {
+                tokens.push(tt_assign);
+                lastToken = tt_assign;
+            }
+            else if((lines[i][j] === 'i') && (lines[i][j+1] === 'f')) {
+                tokens.push(tt_if);
+                lastToken = tt_if;
+                j++;
+            }
+            else if((lines[i][j] === 'e') && (lines[i][j+1] === 'l') && (lines[i][j+2] === 's') && (lines[i][j+3] === 'e')) {
+                tokens.push(tt_else);
+                lastToken = tt_else;
+                j += 3;
+            }
+            else if((lines[i][j] === 'e') && (lines[i][j+1] === 'l') && (lines[i][j+2] === 'i') && (lines[i][j+3] === 'f')) {
+                tokens.push(tt_elif);
+                lastToken = tt_elif;
+                j += 3;
+            }
+            else if((lines[i][j] === 'f') && (lines[i][j+1] === 'o') && (lines[i][j+2] === 'r')) {
+                tokens.push(tt_for);
+                lastToken = tt_for;
+                j += 2;
+            }
+            else if((lines[i][j] === 'w') && (lines[i][j+1] === 'h') && (lines[i][j+2] === 'i') && (lines[i][j+3] === 'l') && (lines[i][j+4] === 'e')) {
+                tokens.push(tt_while);
+                lastToken = tt_while;
+                j += 4;
+            }
+
             else if(/^[0-9.]$/.test(lines[i][j])) {
                 let temp = (makeNumber(i, j, lines));
                 if(lastToken === tt_rparen) {
@@ -212,6 +283,10 @@ function parser() {
     var queue = [];
     var errors = 'Parsing errors:';
     for(let i = 0; i < input.length; i++) {
+        if(input[i] === tt_if) {
+            
+        }
+
         if(input[i].startsWith(tt_int) || input[i].startsWith(tt_float) || input[i].startsWith('var')) {
             queue.push(input[i]);
         }
