@@ -1,12 +1,17 @@
 
 var variables = ['abc', 'yeet'];
 
-var tt_for = 'for'; //imma implement these next
+var tt_for = 'for';
 var tt_while = 'while';
-
 var tt_if = 'if';
 var tt_else = 'else';
 var tt_elif = 'elseIf';
+
+var tt_in = 'in'; //need to add these
+var tt_break = 'break';
+var tt_continue = 'continue';
+var tt_colons = 'colons';
+var tt_brackets = 'brackets';
 
 var tt_assign = 'assign'; 
 var tt_equal = 'equals';
@@ -15,7 +20,8 @@ var tt_greatEQ = 'greatEQ';
 var tt_lessEQ = 'lessEQ';
 var tt_less = 'less';
 var tt_great = 'greater';
-
+var tt_true = 'True';
+var tt_false = 'False';
 
 var tt_int = 'int';
 var tt_float = 'float'; //doesnt support on urcl yet
@@ -27,12 +33,14 @@ var tt_exp = 'exp';
 var tt_sqrt = 'sqrt';
 var tt_lparen = 'lparen';
 var tt_rparen = 'rparen';
+var tt_space = 'space';
 
 //LEXER
 
 function lexer() {
     var input = document.getElementById('input').value;
 
+    var line_tokens;
     var tokens = [];
     var errors = "Lexing errors:";
 
@@ -41,37 +49,44 @@ function lexer() {
 
     var lines = input.split("\n");
     for(let i = 0; i < lines.length; i++) {
+        line_tokens = [];
         for(let j = 0; j < lines[i].length; j++) {
-            while(lines[i][j] === " " || lines[i][j] === "\t" || lines[i][j] === "\n") {
-                j++;
+            if(lines[i][j] === " ") {
+                line_tokens.push(tt_space);
             }
-            if(lines[i][j] === '+') {
-                tokens.push(tt_plus);
+            else if(lines[i][j] === '\t') {
+                line_tokens.push(tt_space);
+                line_tokens.push(tt_space);
+                line_tokens.push(tt_space);
+                line_tokens.push(tt_space);
+            }
+            else if(lines[i][j] === '+') {
+                line_tokens.push(tt_plus);
                 lastToken = tt_plus;
             }
             else if(lines[i][j] === '-') {
-                tokens.push(tt_minus);
+                line_tokens.push(tt_minus);
                 lastToken = tt_minus;
             }
-            else if((lines[i][j] === '*') && (lines[i][j+1] !== '*')) {
+            else if((lines[i][j] === '*') && (lines[i][j+1] !== '*') && (lines[i][j+1] !== undefined)) {
                 if((((lastToken === tt_div) || (lastToken === tt_sqrt) || (lastToken === tt_mult))) || ((lastToken === tt_lparen) || (lastToken === tt_minus)) || (lastToken === tt_plus)) {        
                     errors += '\n' + 'Invalid combination of operators at position ' + j + ' at line ' + i;
                 }
-                tokens.push(tt_mult);
+                line_tokens.push(tt_mult);
                 lastToken = tt_mult;
             }
             else if(lines[i][j] === '/') {
                 if((((lastToken === tt_div) || (lastToken === tt_exp)) || ((lastToken === tt_sqrt) || (lastToken === tt_mult))) || ((lastToken === tt_lparen) || (lastToken === tt_minus)) || (lastToken === tt_plus)) {        
                     errors += '\n' + 'Invalid combination of operators at position ' + j + ' at line ' + i;
                 }
-                tokens.push(tt_div);
+                line_tokens.push(tt_div);
                 lastToken = tt_div;
             }
             else if((lines[i][j] === '*') && (lines[i][j+1] === '*')) {
                 if((((lastToken === tt_div) || (lastToken === tt_exp)) || (lastToken === tt_mult)) || ((lastToken === tt_lparen) || (lastToken === tt_minus)) || (lastToken === tt_plus)) {        
                     errors += '\n' + 'Invalid combination of operators at position ' + j + ' at line ' + i;
                 }
-                tokens.push(tt_exp);
+                line_tokens.push(tt_exp);
                 lastToken = tt_exp;
                 j++;
             }
@@ -80,7 +95,7 @@ function lexer() {
                     tokens.push(tt_mult);
                 }
                 leftP = true;
-                tokens.push(tt_lparen);
+                line_tokens.push(tt_lparen);
                 lastToken = tt_lparen;
             }
             else if(lines[i][j] === ')') {
@@ -94,78 +109,88 @@ function lexer() {
                     errors += '\n' + 'Invalid combination of operators at position ' + j + ' at line ' + i;
                 }
                 
-                tokens.push(tt_rparen);
+                line_tokens.push(tt_rparen);
                 lastToken = tt_rparen;
             }
             // part of the new version
             else if(lines[i][j] === '<') {
                 if(lines[i][j+1] === '=') {
-                    tokens.push(tt_lessEQ);
+                    line_tokens.push(tt_lessEQ);
                     lastToken = tt_lessEQ;
                     j++;
                 }
                 else {
-                    tokens.push(tt_less);
+                    line_tokens.push(tt_less);
                     lastToken = tt_less;
                 }
             }
             else if(lines[i][j] === '>') {
                 if(lines[i][j+1] === '=') {
-                    tokens.push(tt_greatEQ);
+                    line_tokens.push(tt_greatEQ);
                     lastToken = tt_greatEQ;
                     j++;
                 }
                 else {
-                    tokens.push(tt_great);
+                    line_tokens.push(tt_great);
                     lastToken = tt_great;
                 }
             }
             else if((lines[i][j] === '!') && (lines[i][j+1] === '=')) {
-                    tokens.push(tt_notEqual);
-                    lastToken = tt_notEqual;
-                    j++;
+                line_tokens.push(tt_notEqual);
+                lastToken = tt_notEqual;
+                j++;
             }
             else if((lines[i][j] === '=') && (lines[i][j+1] === '=')) {
-                tokens.push(tt_equal);
+                line_tokens.push(tt_equal);
                 lastToken = tt_equal;
                 j++;
             }
             else if(lines[i][j] === '=') {
-                tokens.push(tt_assign);
+                line_tokens.push(tt_assign);
                 lastToken = tt_assign;
             }
             else if((lines[i][j] === 'i') && (lines[i][j+1] === 'f')) {
-                tokens.push(tt_if);
+                line_tokens.push(tt_if);
                 lastToken = tt_if;
                 j++;
             }
             else if((lines[i][j] === 'e') && (lines[i][j+1] === 'l') && (lines[i][j+2] === 's') && (lines[i][j+3] === 'e')) {
-                tokens.push(tt_else);
+                line_tokens.push(tt_else);
                 lastToken = tt_else;
                 j += 3;
             }
             else if((lines[i][j] === 'e') && (lines[i][j+1] === 'l') && (lines[i][j+2] === 'i') && (lines[i][j+3] === 'f')) {
-                tokens.push(tt_elif);
+                line_tokens.push(tt_elif);
                 lastToken = tt_elif;
                 j += 3;
             }
             else if((lines[i][j] === 'f') && (lines[i][j+1] === 'o') && (lines[i][j+2] === 'r')) {
-                tokens.push(tt_for);
+                line_tokens.push(tt_for);
                 lastToken = tt_for;
                 j += 2;
             }
             else if((lines[i][j] === 'w') && (lines[i][j+1] === 'h') && (lines[i][j+2] === 'i') && (lines[i][j+3] === 'l') && (lines[i][j+4] === 'e')) {
-                tokens.push(tt_while);
+                line_tokens.push(tt_while);
                 lastToken = tt_while;
+                j += 4;
+            }
+            else if((lines[i][j] === 'T') && (lines[i][j+1] === 'r') && (lines[i][j+2] === 'u') && (lines[i][j+3] === 'e')) {
+                line_tokens.push(tt_true);
+                lastToken = tt_true;
+                j += 3;
+            }
+            else if((lines[i][j] === 'F') && (lines[i][j+1] === 'a') && (lines[i][j+2] === 'l') && (lines[i][j+3] === 's') && (lines[i][j+4] === 'e')) {
+                line_tokens.push(tt_false);
+                lastToken = tt_false;
                 j += 4;
             }
 
             else if(/^[0-9.]$/.test(lines[i][j])) {
                 let temp = (makeNumber(i, j, lines));
                 if(lastToken === tt_rparen) {
-                    tokens.push(tt_mult);
+                    line_tokens.push(tt_mult);
                 }
-                tokens.push(`${temp[0][0]}:${temp[0][1]}`);
+                line_tokens.push(`${temp[0][0]}:${temp[0][1]}`);
                 j = temp[1];
                 j--;
                 lastToken = temp[0][0];
@@ -174,11 +199,11 @@ function lexer() {
                 let temp = makeVar(i, j, lines);
                 let bool = false;
                 if(lastToken === tt_rparen) {
-                    tokens.push(tt_mult);
+                    line_tokens.push(tt_mult);
                 }
                 for(let k = 0; k < variables.length; k++) {
                     if(temp[0] === variables[k]) {
-                        tokens.push('var:' + temp[0]);
+                        line_tokens.push('var:' + temp[0]);
                         bool = true;
                         lastToken = 'var';
                         break
@@ -199,15 +224,15 @@ function lexer() {
                 }
             }
         }
-        console.log(tokens);
-        console.log(errors);
-        if(errors === 'Lexing errors:') {
-            errors = '';
-        }
-        document.getElementById('lexerOutput').innerHTML = tokens + '\n' + errors;
-        return tokens
+        tokens.push(line_tokens);
     }
-    
+    console.log(tokens);
+    console.log(errors);
+    if(errors === 'Lexing errors:') {
+        errors = '';
+    }
+    document.getElementById('lexerOutput').innerHTML = tokens + '\n' + errors;
+    return tokens
     
 }
 
@@ -278,57 +303,94 @@ function makeVar(i, j, lines) {
 
 function parser() {
     var input = lexer();
-
+    var errors = 'Parsing errors:';
     var stack = [];
     var queue = [];
-    var errors = 'Parsing errors:';
+    var idented;
+    var idententation;
+    var lastIdentation;
     for(let i = 0; i < input.length; i++) {
-        if(input[i] === tt_if) {
-            
-        }
-
-        if(input[i].startsWith(tt_int) || input[i].startsWith(tt_float) || input[i].startsWith('var')) {
-            queue.push(input[i]);
-        }
-        else if(input[i].startsWith(tt_exp)) {
-            stack.push(input[i]);
-        }
-        else if(input[i] === tt_lparen) {
-            stack.push(input[i]);
-        }
-        else if((input[i] === tt_minus) || ((input[i]) === tt_plus)) {
-            while((stack[stack.length-1] === tt_div) || (stack[stack.length-1] === tt_mult) || (stack[stack.length-1] === tt_plus) || (stack[stack.length-1] === tt_minus)) {
-                queue.push(stack.pop());
+        lastIdentation = idententation;
+        idententation = 0;
+        idented = false;
+        for(let j = 0; j < input[i].length; j++) {
+            while(input[i][j] === tt_space) {
+                if(!idented) {
+                    idententation++;
+                    j++;
+                }
             }
-            stack.push(input[i]);
-        }
-        else if((input[i] === tt_div) || (input[i] === tt_mult)) {
-            while((stack[stack.length-1] === tt_div) || (stack[stack.length-1] === tt_mult)) {
-                queue.push(stack.pop());
+            idented = true;
+            if((input[i][j].startsWith(tt_int) || input[i][j].startsWith(tt_float)) || 
+            ((input[i][j].startsWith('var')) || input[i][j] === tt_exp)) {
+                queue.push(input[i][j]);
             }
-            stack.push(input[i]);
-        }
-        else if(input[i] === tt_rparen) {
-            while(stack[stack.length-1] !== tt_lparen) {
-                queue.push(stack.pop());
+            else if (input[i][j] === tt_true || input[i][j] === tt_false) {
+                if(input[i][j] === tt_true) {
+                    queue.push('int:1');
+                }
+                else {
+                    queue.push('int:0');
+                }
             }
-            stack.pop();
+            else if(((input[i][j] === tt_lparen) || (input[i][j] === tt_assign)) || 
+            ((input[i][j] === tt_while) || (input[i][j] === tt_for))) {
+                stack.push(input[i][j]);
+            }
+            else if((((input[i][j] === tt_less) || ((input[i][j]) === tt_lessEQ)) || 
+            ((input[i][j] === tt_great) || ((input[i][j]) === tt_greatEQ))) || 
+            ((input[i][j] === tt_equal) || ((input[i][j]) === tt_notEqual))) {
+                while((((stack[stack.length-1] === tt_div) || (stack[stack.length-1] === tt_mult)) || 
+                ((stack[stack.length-1] === tt_plus) || (stack[stack.length-1] === tt_minus))) || 
+                (((input[i][j] === tt_less) || ((input[i][j]) === tt_lessEQ)) || 
+                ((input[i][j] === tt_great) || ((input[i][j]) === tt_greatEQ))) ||
+                ((input[i][j] === tt_equal) || ((input[i][j]) === tt_notEqual))) {
+                    queue.push(stack.pop());
+                }
+                stack.push(input[i][j]);
+            }
+            else if((input[i][j] === tt_minus) || ((input[i][j]) === tt_plus)) {
+                while(((stack[stack.length-1] === tt_div) || (stack[stack.length-1] === tt_mult)) || 
+                ((stack[stack.length-1] === tt_plus) || (stack[stack.length-1] === tt_minus))) {
+                    queue.push(stack.pop());
+                }
+                stack.push(input[i][j]);
+            }
+            else if((input[i][j] === tt_div) || (input[i][j] === tt_mult)) {
+                while((stack[stack.length-1] === tt_div) || (stack[stack.length-1] === tt_mult)) {
+                    queue.push(stack.pop());
+                }
+                stack.push(input[i][j]);
+            }
+            else if(input[i][j] === tt_rparen) {
+                while(stack[stack.length-1] !== tt_lparen) {
+                    queue.push(stack.pop());
+                }
+                stack.pop();
+            }
+            else {
+                console.log('something went very wrong :/');
+                errors += '\n' + 'unknown type of lexed output, pls fix this error on the lexer'
+            }
         }
-        else {
-            console.log('something went very wrong :/');
-            errors += '\n' + 'unknown type of lexed output, pls fix this error on the lexer'
+    let temp = stack.length;
+        for(let j = 0; j < temp; j++) {
+            queue.push(stack.pop());
         }
-   }
-   let temp = stack.length;
-    for(let i = 0; i < temp; i++) {
-        queue.push(stack.pop());
     }
+
     if(errors === 'Parsing errors:') {
         errors = '';
     }
     document.getElementById('parserOutput').innerHTML = queue + '\n' + errors;
     return queue
 }
+
+//called by parser
+function checkIdentation(input) {
+
+}
+
 
 //interpreter           gotta fix outputs calculated before any variable beeing shown before the instruction
 
