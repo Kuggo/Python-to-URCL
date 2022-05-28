@@ -8,3 +8,11 @@ functions and calls
 Float as variable (as soon as those are on URCL++)
 string methods (as soon as they are updated to URCL++)
 other missing features wont work, but the compiler wont stop working if fed some of these keywords (it will just not read that part)
+
+------
+Archived
+------
+Closed project, as it was unrealistic, and didnt make use of python's library to parse python code. Didnt have time for it anyways.
+Have a great day!
+
+Kuggo
